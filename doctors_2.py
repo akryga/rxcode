@@ -11,7 +11,6 @@ log.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', level=log.DEBUG)
 # функция нормализации федеральных субъектов
 # -----------------------------------------------------------------------------
 def federation_subject_norm(trial, fedSubj):
-
     if not trial or isinstance(trial, float):
         return trial
     isfs = fedSubj[fedSubj.eq(trial).any(axis=1)]
@@ -143,6 +142,7 @@ except OSError:
 # tmp2.loc[(176,166590),'0'] -> "(2, [('8721d51b-7f94-48bc-a93e-710f0cac4828', '33e7ccf2-ca43-4b5b-8758-c20347c17c30'), ('e224652c-8a5e-4b67-84e7-a4d9cfaa46b5', 'a36ce782-4d33-4ecb-9b6e-2364e1f9bb6d')])"
 # tmp2.loc[(176,166590)]['0'] -> "(2, [('8721d51b-7f94-48bc-a93e-710f0cac4828', '33e7ccf2-ca43-4b5b-8758-c20347c17c30'), ('e224652c-8a5e-4b67-84e7-a4d9cfaa46b5', 'a36ce782-4d33-4ecb-9b6e-2364e1f9bb6d')])"
 # tmp2.loc[(176,166590)].iloc[0] ->  "(2, [('8721d51b-7f94-48bc-a93e-710f0cac4828', '33e7ccf2-ca43-4b5b-8758-c20347c17c30'), ('e224652c-8a5e-4b67-84e7-a4d9cfaa46b5', 'a36ce782-4d33-4ecb-9b6e-2364e1f9bb6d')])"
+# разбор текста в json ast.literal_eval
 # ast.literal_eval(tmp2.loc[(176,166590)].iloc[0]) -> (2, [('8721d51b-7f94-48bc-a93e-710f0cac4828', '33e7ccf2-ca43-4b5b-8758-c20347c17c30'), ('e224652c-8a5e-4b67-84e7-a4d9cfaa46b5', 'a36ce782-4d33-4ecb-9b6e-2364e1f9bb6d')])
 # ast.literal_eval(tmp2.loc[(176,166590)].iloc[0])[0] -> 2
 # ast.literal_eval(tmp2.loc[(176,166590)].iloc[0])[1] -> [('8721d51b-7f94-48bc-a93e-710f0cac4828', '33e7ccf2-ca43-4b5b-8758-c20347c17c30'), ('e224652c-8a5e-4b67-84e7-a4d9cfaa46b5', 'a36ce782-4d33-4ecb-9b6e-2364e1f9bb6d')]
