@@ -21,22 +21,31 @@ fname = '.cache/original_cities.csv'
 origCities = pandas.DataFrame()
 
 try:
-    origCities = pandas.read_csv(fname)
+    origCities = pandas.read_csv(fname, index_col='source_id')
     log.info('Загрузили cache городов')
 except OSError:
     log.warning("Could not open/read cache file: %s", fname)
     # готовим справочник городов
     log.info('Готовим города')
-    origCities=sl[sl.city.notna()].city.str.title().drop_duplicates().sort_values()
+    origCities['city'] = sl[sl.city.notna()].city.str.title().drop_duplicates().sort_values()
+	
+    # убираем написание с заглавной всех с. пгт. п. ст.
+    st_list = ['Ст. ', 'Д. ', 'С. ', 'П. ', 'Пгт. ', 'А. ', 'Пос. ']
+    flower = lambda s: s[:1].lower() + s[1:] if any(s[0:len(e)] == e for e in st_list) else s
+    origCities.city = origCities.city.apply(flower)
+	# исправляем все (Обл.|Обл) на Область
+    origCities.replace(regex = r'(.*)(Обл\b.*)', value = r'\1Область)', inplace=True)
+
     log.info('Завершили готовить города')
     origCities.to_csv(fname, quoting=csv.QUOTE_NONNUMERIC)
     log.info('Сохранили cache городов')
     
 cities = origCities.city.tolist()
 # совпадение е<->ё
-sl[sl.city.str.match(r'.*ё', case=False)&sl.city.notna()].city.tolist()
-# наличие , или .
+sl[sl.city.str.match(r'.*ё', case=False)&sl.city.notna()].city
+# наличие в названии города , или .
 sl[sl.city.str.match(r'.*[,\.]', case=False)&sl.city.notna()].city
+
 # наличие в адресе (Пермский край) или регион+город - Республика Саха (Якутия), Якутск
 sl[sl.addr.str.match(r'.*\(\w+\)', case=False)&sl.addr.notna()]
 # (с.) (п.) (ст.) п.г.т г.
@@ -55,8 +64,8 @@ ct_patt = r'(\b' + r'\b)|(\b'.join(cities) + r'\b)'
 re_patt = re.compile(ct_patt)
 gr = re_patt.findall('Тверская область, Торжок, Уфа, Москва')
 
-def loboda(rx):    
-	global ct_patt, re_patt
+def loboda(rx):    # найти в адресе возможные города
+	global re_patt
 	gr = re_patt.findall(rx.addr)
 	ret = []
 	if gr:
